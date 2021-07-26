@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 
@@ -35,7 +36,7 @@ public class ConfigItem {
 		final Material material = Material.getMaterial(section.getString("material-type"));
 		if (material == null) {
 			Bukkit.getLogger().severe("Item Material is null: " + section.getString("material-type") + " in " + section.getRoot().getName());
-			return new ConfigItem(0,new MaterialData(Material.STONE, (byte) 0),null,null,null);
+			return new ConfigItem(0, new MaterialData(Material.STONE, (byte) 0), null, null, null);
 		}
 
 		String name = null;
@@ -89,16 +90,29 @@ public class ConfigItem {
 	public ItemStack toItemStack(PlaceholderUtil placeholder) {
 		final ItemStack result = material.toItemStack(amount);
 
-		if (enchantments != null)
-			result.addUnsafeEnchantments(enchantments);
 
 		if (name != null || lore != null) {
 			final ItemMeta meta = result.getItemMeta();
-			if (name != null)
+			if (name != null) {
 				meta.setDisplayName(placeholder.apply(name));
-			if (lore != null)
+			}
+			if (lore != null) {
 				meta.setLore(placeholder.apply(lore));
+			}
 			result.setItemMeta(meta);
+		}
+
+		if (enchantments != null) {
+			if (material.getItemType().equals(Material.ENCHANTED_BOOK)) {
+				final EnchantmentStorageMeta meta = (EnchantmentStorageMeta) result.getItemMeta();
+				if (meta == null) return result;
+				for (Map.Entry<Enchantment, Integer> enchant : enchantments.entrySet()) {
+					meta.addStoredEnchant(enchant.getKey(), enchant.getValue(), true);
+				}
+				result.setItemMeta(meta);
+			} else {
+				result.addUnsafeEnchantments(enchantments);
+			}
 		}
 
 		return result;
