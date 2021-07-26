@@ -14,10 +14,9 @@ public class ItemReward implements QuestReward {
 
 	private final List<ItemStack> items;
 
-	public ItemReward(List<ItemStack> items) {
+	private ItemReward(List<ItemStack> items) {
 		this.items = items;
 	}
-
 
 	@Override
 	public void deliverRewards(Player player) {
