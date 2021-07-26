@@ -1,0 +1,106 @@
+quest-1:
+  quest-parts: 3
+  name: 'deneme3'
+  icon-states:
+    COMPLETED:
+      name: '&aCompleted!'
+      lore:
+        - "&fCompleted: &a{quest_completed_parts}&8/&c{quest_parts}"
+        - "&eHi {player_name}!"
+      amount: 1
+      material-type: 'BLAZE_ROD'
+      material-data: 0
+    COMPLETABLE:
+      name: '&aCompletable &e&l[CLICK]'
+      lore:
+        - "&fCompleted: &a{quest_completed_parts}&8/&c{quest_parts}"
+        - "&eHi {player_name}!"
+      amount: 1
+      material-type: 'BLAZE_ROD'
+      material-data: 0
+    UNAFFORDABLE:
+      name: '&cUnaffordable'
+      lore:
+        - "&fCompleted: &a{quest_completed_parts}&8/&c{quest_parts}"
+        - "&eHi {player_name}!"
+      amount: 1
+      material-type: 'BLAZE_ROD'
+      material-data: 0
+  requirement-1:
+    requirement-type: 'item'
+    1:
+      material-type: 'BLAZE_ROD'
+      material-data: 0
+      amount: 10
+  reward-1:
+    reward-type: 'item'
+    1:
+      material-type: 'DIAMOND'
+      material-data: 0
+      amount: 20
+quest-2:
+  quest-parts: 1
+  name: 'deneme4'
+  icon-states:
+    COMPLETED:
+      name: '&aCompleted!'
+      lore:
+        - "&eHi {player_name}!"
+      amount: 1
+      material-type: 'WOOL'
+      glow: true
+      material-data: 13
+    COMPLETABLE:
+      name: '&aCompletable &e&l[CLICK]'
+      lore:
+        - "&eHi {player_name}!"
+      amount: 1
+      material-type: 'WOOL'
+      material-data: 13
+    UNAFFORDABLE:
+      name: '&cUnaffordable'
+      lore:
+        - "&eHi {player_name}!"
+      amount: 1
+      material-type: 'WOOL'
+      material-data: 13
+  requirement-1:
+    requirement-type: 'item'
+    1:
+      material-type: 'STONE'
+      material-data: 0
+      amount: 10
+  reward-1:
+    reward-type: 'item'
+    1:
+      material-type: 'WOOL'
+      material-data: 15
+      amount: 20
+page-complete:
+  icon-states:
+    COMPLETED:
+      name: '&aCompleted!'
+      lore:
+        - "&eHi {player_name}!"
+      material-type: 'ANVIL'
+      glow: true
+    COMPLETABLE:
+      name: '&aCompletable &e&l[CLICK]'
+      lore:
+        - "&eHi {player_name}!"
+      material-type: 'ANVIL'
+    UNAFFORDABLE:
+      name: '&cUnaffordable'
+      lore:
+        - "&eHi {player_name}!"
+      material-type: 'ANVIL'
+  requirement-1:
+    requirement-type: 'item'
+    1:
+      material-type: 'DIAMOND'
+      material-data: 0
+      amount: 15
+  requirement-2:
+    requirement-type: 'superiorskyblock'
+    1:
+      island-level: 4000

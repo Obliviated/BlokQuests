@@ -1,0 +1,13 @@
+name: BlokQuests
+main: mc.obliviate.blokquests.BlokQuests
+author: Mr_Obliviate
+version: 1.0.1
+commands:
+  quest:
+    aliases:
+      - görev
+      - görevler
+      - quest
+      - c
+      - challange
+      - challanges
