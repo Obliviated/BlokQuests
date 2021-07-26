@@ -7,7 +7,10 @@ import mc.obliviate.blokquests.handlers.YamlConfigurationSerializer;
 import mc.obliviate.blokquests.handlers.database.ADatabase;
 import mc.obliviate.blokquests.handlers.database.YamlDatabase;
 import mc.obliviate.blokquests.listeners.EntityDeathListener;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.efekurbann.inventory.InventoryAPI;
 
@@ -19,6 +22,8 @@ public class BlokQuests extends JavaPlugin {
 	private final ConfigHandler configHandler = new ConfigHandler(this);
 	private final InventoryAPI inventoryAPI = new InventoryAPI(this);
 	private final EntityDeathListener entityDeathListener = new EntityDeathListener(this);
+	private static Economy economy;
+	private static Permission permission;
 
 	public static ADatabase getaDatabase() {
 		return aDatabase;
@@ -31,6 +36,8 @@ public class BlokQuests extends JavaPlugin {
 		registerListeners();
 	}
 
+
+
 	private void registerCommands() {
 		getCommand("quest").setExecutor(new QuestCmd(this));
 	}
@@ -38,6 +45,8 @@ public class BlokQuests extends JavaPlugin {
 	private void setupHandlers() {
 		configHandler.load();
 		inventoryAPI.init();
+		setupEconomy();
+		setupPermissions();
 
 		aDatabase = connectDatabase();
 	}
@@ -54,6 +63,29 @@ public class BlokQuests extends JavaPlugin {
 		throw new IllegalStateException("Database Type could not deserialized.");
 	}
 
+	private boolean setupEconomy() {
+		if (getServer().getPluginManager().isPluginEnabled("Vault")) {
+
+			RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+			if (rsp == null) {
+				return false;
+			}
+			economy = rsp.getProvider();
+			return economy != null;
+		}
+		return false;
+	}
+
+	private boolean setupPermissions() {
+		if (getServer().getPluginManager().isPluginEnabled("Vault")) {
+			RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+			permission = rsp.getProvider();
+			return permission != null;
+		}
+		return false;
+	}
+
+
 	public YamlConfigurationSerializer getYamlDatabaseHandler() {
 		return yamlConfigurationSerializer;
 	}
@@ -68,5 +100,13 @@ public class BlokQuests extends JavaPlugin {
 
 	public EntityDeathListener getEntityDeathListener() {
 		return entityDeathListener;
+	}
+
+	public static Economy getEconomy() {
+		return economy;
+	}
+
+	public static Permission getPermission() {
+		return permission;
 	}
 }

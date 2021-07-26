@@ -5,8 +5,10 @@ import mc.obliviate.blokquests.quest.Quest;
 import mc.obliviate.blokquests.quest.QuestCompleteState;
 import mc.obliviate.blokquests.quest.QuestPage;
 import mc.obliviate.blokquests.requirements.QuestRequirement;
+import mc.obliviate.blokquests.requirements.economyrequirement.EconomyRequirement;
 import mc.obliviate.blokquests.requirements.itemrequirement.ItemRequirement;
 import mc.obliviate.blokquests.requirements.mobkillrequirement.MobKillRequirement;
+import mc.obliviate.blokquests.requirements.permissionrequirement.PermissionRequirement;
 import mc.obliviate.blokquests.requirements.superiorrequirement.SupSkyLevRequirement;
 import mc.obliviate.blokquests.requirements.xprequirement.ExperienceRequirement;
 import mc.obliviate.blokquests.rewards.QuestReward;
@@ -128,6 +130,10 @@ public class YamlConfigurationSerializer {
 			return requirement;
 		} if (requirementType.equalsIgnoreCase("experience")) {
 			return ExperienceRequirement.deserialize(section);
+		} if (requirementType.equalsIgnoreCase("permission")) {
+			return PermissionRequirement.deserialize(section);
+		}if (requirementType.equalsIgnoreCase("economy")) {
+			return EconomyRequirement.deserialize(section);
 		}
 
 		throw new IllegalArgumentException("Unknown requirement type: " + requirementType);
