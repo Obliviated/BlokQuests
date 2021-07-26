@@ -12,6 +12,7 @@ import mc.obliviate.blokquests.requirements.permissionrequirement.PermissionRequ
 import mc.obliviate.blokquests.requirements.superiorrequirement.SupSkyLevRequirement;
 import mc.obliviate.blokquests.requirements.xprequirement.ExperienceRequirement;
 import mc.obliviate.blokquests.rewards.QuestReward;
+import mc.obliviate.blokquests.rewards.economyrewards.EconomyReward;
 import mc.obliviate.blokquests.rewards.itemrewards.ItemReward;
 import mc.obliviate.blokquests.utils.ConfigItem;
 import org.bukkit.Bukkit;
@@ -144,7 +145,10 @@ public class YamlConfigurationSerializer {
 
 		if (requirementType.equalsIgnoreCase("item")) {
 			return ItemReward.deserialize(section);
+		}if (requirementType.equalsIgnoreCase("economy")) {
+			return EconomyReward.deserialize(section);
 		}
+
 		throw new IllegalArgumentException("Unknown reward type: " + requirementType);
 
 	}
