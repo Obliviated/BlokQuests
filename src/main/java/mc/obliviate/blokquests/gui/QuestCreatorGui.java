@@ -1,6 +1,6 @@
 package mc.obliviate.blokquests.gui;
 
-import xyz.efekurbann.inventory.GUI;
+import mc.obliviate.blokquests.inventory.GUI;
 
 public class QuestCreatorGui extends GUI {
 

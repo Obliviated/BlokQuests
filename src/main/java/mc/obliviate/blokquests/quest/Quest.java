@@ -5,6 +5,10 @@ import mc.obliviate.blokquests.requirements.QuestRequirement;
 import mc.obliviate.blokquests.utils.BlokUtils;
 import mc.obliviate.blokquests.utils.ConfigItem;
 import mc.obliviate.blokquests.rewards.QuestReward;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -14,14 +18,14 @@ import java.util.Map;
 public class Quest {
 
 	private final int questPart;
-	private final Map<QuestCompleteState, ConfigItem> displayIcons;
+	private final Map<CompleteState, ConfigItem> displayIcons;
 	private final int page;
 	private final int index;
 	private final String name;
 	private final List<QuestRequirement> requirements;
 	private final List<QuestReward> rewards;
 
-	public Quest(int questPart, int page, int index, String name, Map<QuestCompleteState, ConfigItem> displayIcons, List<QuestRequirement> requirements, List<QuestReward> rewards) {
+	public Quest(int questPart, int page, int index, String name, Map<CompleteState, ConfigItem> displayIcons, List<QuestRequirement> requirements, List<QuestReward> rewards) {
 		this.questPart = questPart;
 		this.page = page;
 		this.index = index;
@@ -48,20 +52,40 @@ public class Quest {
 		for (QuestReward qRew : rewards) {
 			qRew.deliverRewards(player);
 		}
+		final String name = getDisplayIcon(CompleteState.COMPLETABLE).getName();
+		final TextComponent button = new TextComponent(name);
+
+
+		final StringBuilder text = new StringBuilder();
+		int lineNo = 3;
+		int max = getDisplayIcon(CompleteState.COMPLETABLE).getLore().size();
+		for (String loreLine : getDisplayIcon(CompleteState.COMPLETABLE).getLore()) {
+			if (++lineNo == max) break;
+			text.append(loreLine).append("\n");
+		}
+		button.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,  new ComponentBuilder(text.toString()).create()));
+
+		final TextComponent result = new TextComponent(BlokUtils.parseColor("&6" + player.getName() + "&7 adlı oyuncu &e"));
+		result.addExtra(button);
+		result.addExtra(new TextComponent(BlokUtils.parseColor("&7 adlı görevi tamamladı!")));
+		if (questPart != 1) {
+			result.addExtra(new TextComponent(BlokUtils.parseColor(" &f(" + completedParts + "/" + questPart + ")")));
+		}
+
+
 		BlokUtils.log(player.getName() + " completed " + name + " (" + completedParts + "/" + questPart + ")");
-		if (questPart == 1) {
-			Bukkit.broadcastMessage(BlokUtils.parseColor("&6" + player.getName() + "&7 adlı oyuncu &e" + name + "&7 adlı görevi tamamladı."));
-		} else {
-			Bukkit.broadcastMessage(BlokUtils.parseColor("&6" + player.getName() + "&7 adlı oyuncu &e" + name + "&7 adlı görevi tamamladı &f(" + completedParts + "/" + questPart + ")"));
+
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			p.spigot().sendMessage(result);
 		}
 	}
 
-	public QuestCompleteState getCompleteState(Player player) {
-		if (BlokQuests.getaDatabase().isCompleted(this, player)) return QuestCompleteState.COMPLETED;
+	public CompleteState getCompleteState(Player player) {
+		if (BlokQuests.getaDatabase().isCompleted(this, player)) return CompleteState.COMPLETED;
 		if (canComplete(player)) {
-			return QuestCompleteState.COMPLETABLE;
+			return CompleteState.COMPLETABLE;
 		} else {
-			return QuestCompleteState.UNAFFORDABLE;
+			return CompleteState.UNAFFORDABLE;
 		}
 	}
 
@@ -81,7 +105,7 @@ public class Quest {
 		return questPart;
 	}
 
-	public ConfigItem getDisplayIcon(QuestCompleteState state) {
+	public ConfigItem getDisplayIcon(CompleteState state) {
 		return displayIcons.get(state);
 	}
 

@@ -3,7 +3,6 @@ package mc.obliviate.blokquests.quest;
 import mc.obliviate.blokquests.BlokQuests;
 import mc.obliviate.blokquests.requirements.QuestRequirement;
 import mc.obliviate.blokquests.utils.ConfigItem;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -11,12 +10,12 @@ import java.util.Map;
 
 public class QuestPage {
 
-	private final Map<QuestCompleteState, ConfigItem> pageCompleteIcon;
+	private final Map<CompleteState, ConfigItem> pageCompleteIcon;
 	private final List<Quest> quests;
 	private final List<QuestRequirement> requirements;
 	private final int pageNumber;
 
-	public QuestPage(Map<QuestCompleteState, ConfigItem> pageCompleteIcon, final int pageNumber, final List<Quest> quests, List<QuestRequirement> requirements) {
+	public QuestPage(Map<CompleteState, ConfigItem> pageCompleteIcon, final int pageNumber, final List<Quest> quests, List<QuestRequirement> requirements) {
 		this.pageCompleteIcon = pageCompleteIcon;
 		this.pageNumber = pageNumber;
 		this.quests = quests;
@@ -39,13 +38,13 @@ public class QuestPage {
 		return true;
 	}
 
-	public QuestCompleteState getCompleteState(Player player) {
-		if (BlokQuests.getaDatabase().isPageCompleted(this, player)) return QuestCompleteState.COMPLETED;
-		if (canCompletePage(player)) return QuestCompleteState.COMPLETABLE;
-		return QuestCompleteState.UNAFFORDABLE;
+	public CompleteState getCompleteState(Player player) {
+		if (BlokQuests.getaDatabase().isPageCompleted(this, player)) return CompleteState.COMPLETED;
+		if (canCompletePage(player)) return CompleteState.COMPLETABLE;
+		return CompleteState.UNAFFORDABLE;
 	}
 
-	public ConfigItem getPageCompleteIcon(QuestCompleteState state) {
+	public ConfigItem getPageCompleteIcon(CompleteState state) {
 		return pageCompleteIcon.get(state);
 	}
 

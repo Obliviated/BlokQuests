@@ -22,7 +22,7 @@ public class YamlDatabase extends ADatabase {
 
 	private File getPlayerDataFile(Player player) {
 		//                                                                                 i think uuid is unnecessary
-		return new File(getPlugin().getDataFolder() + File.separator + "playerdata" + File.separator + player.getName() + ".yml");
+		return new File(getPlugin().getDataFolder() + File.separator + "playerdata" + File.separator + player.getName().toLowerCase() + ".yml");
 	}
 
 	private YamlConfiguration getPlayerData(Player player) {

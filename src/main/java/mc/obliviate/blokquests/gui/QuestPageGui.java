@@ -1,8 +1,10 @@
 package mc.obliviate.blokquests.gui;
 
 import mc.obliviate.blokquests.BlokQuests;
+import mc.obliviate.blokquests.inventory.GUI;
+import mc.obliviate.blokquests.inventory.Hytem;
+import mc.obliviate.blokquests.quest.CompleteState;
 import mc.obliviate.blokquests.quest.Quest;
-import mc.obliviate.blokquests.quest.QuestCompleteState;
 import mc.obliviate.blokquests.quest.QuestPage;
 import mc.obliviate.blokquests.requirements.QuestRequirement;
 import mc.obliviate.blokquests.requirements.itemrequirement.ItemRequirement;
@@ -10,16 +12,13 @@ import mc.obliviate.blokquests.requirements.mobkillrequirement.MobKillRequiremen
 import mc.obliviate.blokquests.utils.BlokUtils;
 import mc.obliviate.blokquests.utils.ConfigItem;
 import mc.obliviate.blokquests.utils.internalplaceholder.PlaceholderUtil;
-import org.apache.commons.lang.ObjectUtils;
+import mc.obliviate.blokquests.utils.xmaterial.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Statistic;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
-import xyz.efekurbann.inventory.GUI;
-import xyz.efekurbann.inventory.Hytem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,7 @@ public class QuestPageGui extends GUI {
 		for (QuestRequirement requirement : questRequirements) {
 			if (requirement instanceof ItemRequirement) {
 				for (ConfigItem configItem : ((ItemRequirement) requirement).getItemStackList()) {
-					displayItems.add(configItem.toItemStack());
+					displayItems.addAll(splitItemAmount(configItem.toItemStack(), configItem.getAmount()));
 				}
 			}
 		}
@@ -51,9 +50,20 @@ public class QuestPageGui extends GUI {
 
 	}
 
+	private static List<ItemStack> splitItemAmount(ItemStack item, int amount) {
+		final List<ItemStack> result = new ArrayList<>();
+		while (amount > 0) {
+			ItemStack resultItem = item.clone();
+			resultItem.setAmount(Math.min(64, amount));
+			result.add(resultItem);
+			amount -= 64;
+		}
+		return result;
+	}
+
 	private static void resetRequirementItems(GUI gui) {
 		for (int i = 29; i < 34; i++) {
-			gui.addItem(i, new Hytem(Material.STAINED_GLASS_PANE).setDamage(0));
+			gui.addItem(i, new Hytem(XMaterial.WHITE_STAINED_GLASS_PANE.parseItem()));
 		}
 	}
 
@@ -64,8 +74,7 @@ public class QuestPageGui extends GUI {
 				.add("{quest_completed_parts}", BlokQuests.getaDatabase().getCompletedParts(quest, player) + "")
 				.add("{quest_parts}", quest.getQuestParts() + "")
 				.add("{player_name}", player.getName() + "")
-				.add("{zombie_kills}", MobKillRequirement.getMobKills(player,EntityType.ZOMBIE) + "")
-
+				.add("{dragon_kills}", MobKillRequirement.getMobKills(player, EntityType.ENDER_DRAGON) + "")
 				;
 	}
 
@@ -76,13 +85,13 @@ public class QuestPageGui extends GUI {
 		int completedPages = BlokQuests.getaDatabase().getCompletedPages(player);
 		if (completedPages + 1 < questPage.getPageNumber()) {
 			Bukkit.getScheduler().runTaskLater(getPlugin(), player::closeInventory, 1);
-			player.sendMessage("bu sayfayı henüz açmadınız: " + completedPages);
+			player.sendMessage(BlokUtils.parseColor("&cBu sayfayı henüz açmadınız: &7" + questPage.getPageNumber()));
 			return;
 		}
 
 		for (int i = 0; i < 5; i++) {
-			addItem(i * 9, new Hytem(new ItemStack(Material.STAINED_GLASS_PANE)).setDamage(7));
-			addItem(i * 9 + 8, new Hytem(new ItemStack(Material.STAINED_GLASS_PANE)).setDamage(7));
+			addItem(i * 9, new Hytem(XMaterial.GRAY_STAINED_GLASS_PANE.parseItem()));
+			addItem(i * 9 + 8, new Hytem(XMaterial.GRAY_STAINED_GLASS_PANE.parseItem()));
 		}
 
 		if (completedPages >= questPage.getPageNumber()) {
@@ -102,15 +111,22 @@ public class QuestPageGui extends GUI {
 		}
 
 
-		QuestCompleteState pageCompleteState = questPage.getCompleteState(player);
+		CompleteState pageCompleteState;
+		if (((BlokQuests) getPlugin()).getDataHandler().getQuestPage(questPage.getPageNumber() + 1) == null) {
+			pageCompleteState = CompleteState.UNAFFORDABLE;
+		} else {
+			pageCompleteState = questPage.getCompleteState(player);
+		}
 		switch (pageCompleteState) {
 			case COMPLETED:
 				addItem(26, new Hytem(questPage.getPageCompleteIcon(pageCompleteState).toItemStack()));
 				break;
 			case COMPLETABLE:
 				addItem(26, new Hytem(questPage.getPageCompleteIcon(pageCompleteState).toItemStack(), e -> {
-					questPage.completePage(player);
-					new QuestPageGui(questPage).open(player);
+					if (questPage.getCompleteState(player).equals(CompleteState.COMPLETABLE)) {
+						questPage.completePage(player);
+						new QuestPageGui(questPage).open(player);
+					}
 				}));
 				break;
 			case UNAFFORDABLE:
@@ -118,23 +134,24 @@ public class QuestPageGui extends GUI {
 				break;
 		}
 
+
 		resetRequirementItems(this);
 
-		int i = 11;
+		int i = 20;
 		for (final Quest quest : questPage.getQuests()) {
 			addItem(i++, getHytem(quest, player));
 		}
 	}
 
 	private Hytem getCompletableStateHytem(Quest quest, PlaceholderUtil placeholders) {
-		return new Hytem(quest.getDisplayIcon(QuestCompleteState.COMPLETABLE).toItemStack(placeholders), e -> {
+		return new Hytem(quest.getDisplayIcon(CompleteState.COMPLETABLE).toItemStack(placeholders), e -> {
 			if (e.isLeftClick()) {
 				final Player clicker = (Player) e.getWhoClicked();
 				if (quest.canComplete(clicker)) {
 					quest.complete(clicker);
 					new QuestPageGui(questPage).open(clicker);
 				} else {
-					clicker.sendMessage("Karşılamıyorsunuz.");
+					clicker.sendMessage(BlokUtils.parseColor("&cGereksinimleri karşılayacak kadar eşyaya sahip değilsiniz."));
 				}
 			} else if (e.isRightClick()) {
 				showRequirementItems(this, quest.getRequirements());
@@ -143,15 +160,15 @@ public class QuestPageGui extends GUI {
 	}
 
 	private Hytem getCompletedStateHytem(Quest quest, PlaceholderUtil placeholders) {
-		return new Hytem(quest.getDisplayIcon(QuestCompleteState.COMPLETED).toItemStack(placeholders), e -> {
+		return new Hytem(quest.getDisplayIcon(CompleteState.COMPLETED).toItemStack(placeholders), e -> {
 			showRequirementItems(this, quest.getRequirements());
 		});
 	}
 
 	private Hytem getUnaffordableStateHytem(Quest quest, PlaceholderUtil placeholders) {
-		return new Hytem(quest.getDisplayIcon(QuestCompleteState.UNAFFORDABLE).toItemStack(placeholders), e -> {
+		return new Hytem(quest.getDisplayIcon(CompleteState.UNAFFORDABLE).toItemStack(placeholders), e -> {
 			if (e.isLeftClick()) {
-				e.getWhoClicked().sendMessage("Karşılamıyorsunuz.");
+				e.getWhoClicked().sendMessage(BlokUtils.parseColor("&cGereksinimleri karşılayacak kadar eşyaya sahip değilsiniz."));
 			} else if (e.isRightClick()) {
 				showRequirementItems(this, quest.getRequirements());
 			}
@@ -160,7 +177,7 @@ public class QuestPageGui extends GUI {
 
 	public Hytem getHytem(Quest quest, Player player) {
 		final PlaceholderUtil placeholders = getPlaceholders(quest, player);
-		final QuestCompleteState state = quest.getCompleteState(player);
+		final CompleteState state = quest.getCompleteState(player);
 		switch (state) {
 			case UNAFFORDABLE:
 				return getUnaffordableStateHytem(quest, placeholders);

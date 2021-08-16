@@ -1,6 +1,7 @@
 package mc.obliviate.blokquests.utils;
 
 import mc.obliviate.blokquests.utils.internalplaceholder.PlaceholderUtil;
+import mc.obliviate.blokquests.utils.xmaterial.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -13,6 +14,7 @@ import org.bukkit.material.MaterialData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class ConfigItem {
 
@@ -32,9 +34,9 @@ public class ConfigItem {
 
 	public static ConfigItem deserializeConfigurableItem(ConfigurationSection section) {
 		final int amount = section.getInt("amount", 1);
-		final byte data = (byte) section.getInt("material-data", 0);
-		final Material material = Material.getMaterial(section.getString("material-type"));
-		if (material == null) {
+
+		final Optional<XMaterial> xMaterial = XMaterial.matchXMaterial(section.getString("material-type") + ":" + section.getInt("material-data", 0));
+		if (!xMaterial.isPresent()) {
 			Bukkit.getLogger().severe("Item Material is null: " + section.getString("material-type") + " in " + section.getRoot().getName());
 			return new ConfigItem(0, new MaterialData(Material.STONE, (byte) 0), null, null, null);
 		}
@@ -42,7 +44,7 @@ public class ConfigItem {
 		String name = null;
 		List<String> lore = null;
 		Map<Enchantment, Integer> enchantments = null;
-		if (section.getStringList("enchantments") != null && !section.getStringList("enchantments").isEmpty()) {
+		if (!section.getStringList("enchantments").isEmpty()) {
 			enchantments = new HashMap<>();
 			for (final String enchantmentString : section.getStringList("enchantments")) {
 				final String[] enchantmentData = enchantmentString.split("=");
@@ -59,11 +61,9 @@ public class ConfigItem {
 		if (section.getString("name") != null) {
 			name = section.getString("name");
 		}
-		if (section.getStringList("lore") != null) {
-			lore = section.getStringList("lore");
-		}
+		lore = section.getStringList("lore");
 
-		return new ConfigItem(amount, new MaterialData(material, data), BlokUtils.parseColor(name), BlokUtils.parseColor(lore), enchantments);
+		return new ConfigItem(amount, new MaterialData(xMaterial.get().parseMaterial(), xMaterial.get().getData()), BlokUtils.parseColor(name), BlokUtils.parseColor(lore), enchantments);
 
 	}
 

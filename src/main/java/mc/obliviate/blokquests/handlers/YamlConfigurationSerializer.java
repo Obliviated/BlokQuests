@@ -2,9 +2,10 @@ package mc.obliviate.blokquests.handlers;
 
 import mc.obliviate.blokquests.BlokQuests;
 import mc.obliviate.blokquests.quest.Quest;
-import mc.obliviate.blokquests.quest.QuestCompleteState;
+import mc.obliviate.blokquests.quest.CompleteState;
 import mc.obliviate.blokquests.quest.QuestPage;
 import mc.obliviate.blokquests.requirements.QuestRequirement;
+import mc.obliviate.blokquests.requirements.bentoboxrequirement.BentoSkyLevelRequirement;
 import mc.obliviate.blokquests.requirements.economyrequirement.EconomyRequirement;
 import mc.obliviate.blokquests.requirements.itemrequirement.ItemRequirement;
 import mc.obliviate.blokquests.requirements.mobkillrequirement.MobKillRequirement;
@@ -51,19 +52,17 @@ public class YamlConfigurationSerializer {
 
 		int lastIndex = 0;
 		while (qConfig.getString("quest-" + ++lastIndex) != null) {
-			plugin.getLogger().info("quest-" + lastIndex);
 			quests.add(getQuest(page, lastIndex, qConfig.getConfigurationSection("quest-" + lastIndex)));
 		}
 
 		lastIndex = 0;
 		final List<QuestRequirement> requirements = new ArrayList<>();
 		while (qConfig.getString("page-complete.requirement-" + ++lastIndex) != null) {
-			plugin.getLogger().info("page-complete.requirement-" + lastIndex);
 			requirements.add(getQuestRequirement(qConfig.getConfigurationSection("page-complete.requirement-" + lastIndex)));
 		}
 
-		final Map<QuestCompleteState, ConfigItem> icons = new HashMap<>();
-		for (QuestCompleteState state : QuestCompleteState.values()) {
+		final Map<CompleteState, ConfigItem> icons = new HashMap<>();
+		for (CompleteState state : CompleteState.values()) {
 			final ConfigurationSection iconSection = qConfig.getConfigurationSection("page-complete.icon-states." + state.name());
 			if (iconSection == null) {
 				Bukkit.getLogger().severe("Unknown item configuration section found: " + qConfig.getCurrentPath() + "page-complete.icon-states." + state.name());
@@ -83,7 +82,6 @@ public class YamlConfigurationSerializer {
 
 		int lastIndex = 0;
 		while (section.getString("requirement-" + ++lastIndex) != null) {
-			plugin.getLogger().info("requirement-" + lastIndex);
 			requirements.add(getQuestRequirement(section.getConfigurationSection("requirement-" + lastIndex)));
 		}
 
@@ -91,16 +89,15 @@ public class YamlConfigurationSerializer {
 
 		lastIndex = 0;
 		while (section.getString("reward-" + ++lastIndex) != null) {
-			plugin.getLogger().info("rewards-" + lastIndex);
 			rewards.add(getQuestReward(section.getConfigurationSection("reward-" + lastIndex)));
 		}
 
 		final String name = section.getString("name", "unknown");
-		final Map<QuestCompleteState, ConfigItem> icons = new HashMap<>();
+		final Map<CompleteState, ConfigItem> icons = new HashMap<>();
 		final int questPart = Math.max(section.getInt("quest-parts", 1),1);
 
 
-		for (QuestCompleteState state : QuestCompleteState.values()) {
+		for (CompleteState state : CompleteState.values()) {
 			final ConfigurationSection iconSection = section.getConfigurationSection("icon-states." + state.name());
 			if (iconSection == null) {
 				Bukkit.getLogger().severe("Unknown item configuration section found: " + section.getCurrentPath() + ".icon-states." + state.name());
@@ -121,11 +118,11 @@ public class YamlConfigurationSerializer {
 		} if (requirementType.equalsIgnoreCase("superiorskyblock")) {
 			return SupSkyLevRequirement.deserialize(section);
 		} if (requirementType.equalsIgnoreCase("mob-kills")) {
-			MobKillRequirement requirement = MobKillRequirement.deserialize(section);
+			final MobKillRequirement requirement = MobKillRequirement.deserialize(section);
 			for (EntityType entityType : requirement.getEntityTypes()) {
 				if (!plugin.getEntityDeathListener().getEntities().contains(entityType)) {
 					plugin.getEntityDeathListener().getEntities().add(entityType);
-					Bukkit.getLogger().info("entity registered to listener: " + entityType);
+					Bukkit.getLogger().info("Entity registered to listener: " + entityType);
 				}
 			}
 			return requirement;
@@ -135,6 +132,8 @@ public class YamlConfigurationSerializer {
 			return PermissionRequirement.deserialize(section);
 		}if (requirementType.equalsIgnoreCase("economy")) {
 			return EconomyRequirement.deserialize(section);
+		}if (requirementType.equalsIgnoreCase("bentobox")) {
+			return BentoSkyLevelRequirement.deserialize(section);
 		}
 
 		throw new IllegalArgumentException("Unknown requirement type: " + requirementType);

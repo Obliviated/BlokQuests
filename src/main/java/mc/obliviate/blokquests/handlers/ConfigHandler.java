@@ -50,7 +50,7 @@ public class ConfigHandler {
 				break;
 			}
 
-			QuestPage questPage = plugin.getYamlDatabaseHandler().getQuestPageFromFile(i);
+			QuestPage questPage = plugin.getYamlSerializer().getQuestPageFromFile(i);
 
 			if (questPage == null) {
 				plugin.getLogger().info("quest page is null");

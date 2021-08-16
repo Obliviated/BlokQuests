@@ -1,6 +1,6 @@
 package mc.obliviate.blokquests.quest;
 
-public enum QuestCompleteState {
+public enum CompleteState {
 
 	COMPLETED,
 	COMPLETABLE,

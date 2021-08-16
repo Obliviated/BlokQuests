@@ -3,6 +3,7 @@ package mc.obliviate.blokquests;
 import mc.obliviate.blokquests.commands.QuestCmd;
 import mc.obliviate.blokquests.handlers.ConfigHandler;
 import mc.obliviate.blokquests.handlers.DataHandler;
+import mc.obliviate.blokquests.handlers.PlaceholderAPIHandler;
 import mc.obliviate.blokquests.handlers.YamlConfigurationSerializer;
 import mc.obliviate.blokquests.handlers.database.ADatabase;
 import mc.obliviate.blokquests.handlers.database.YamlDatabase;
@@ -10,9 +11,10 @@ import mc.obliviate.blokquests.listeners.EntityDeathListener;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import xyz.efekurbann.inventory.InventoryAPI;
+import mc.obliviate.blokquests.inventory.InventoryAPI;
 
 public class BlokQuests extends JavaPlugin {
 
@@ -22,6 +24,7 @@ public class BlokQuests extends JavaPlugin {
 	private final ConfigHandler configHandler = new ConfigHandler(this);
 	private final InventoryAPI inventoryAPI = new InventoryAPI(this);
 	private final EntityDeathListener entityDeathListener = new EntityDeathListener(this);
+	private final PlaceholderAPIHandler placeholderAPIHandler = new PlaceholderAPIHandler();
 	private static Economy economy;
 	private static Permission permission;
 
@@ -36,8 +39,6 @@ public class BlokQuests extends JavaPlugin {
 		registerListeners();
 	}
 
-
-
 	private void registerCommands() {
 		getCommand("quest").setExecutor(new QuestCmd(this));
 	}
@@ -45,6 +46,7 @@ public class BlokQuests extends JavaPlugin {
 	private void setupHandlers() {
 		configHandler.load();
 		inventoryAPI.init();
+		placeholderAPIHandler.init(this);
 		setupEconomy();
 		setupPermissions();
 
@@ -56,7 +58,7 @@ public class BlokQuests extends JavaPlugin {
 	}
 
 	private ADatabase connectDatabase() {
-		String databaseType = getConfigHandler().getConfig().getString("database-type");
+		String databaseType = getConfigHandler().getConfig().getString("database-type", "yaml");
 		if (databaseType.equalsIgnoreCase("yaml")) {
 			return new YamlDatabase(this);
 		}
@@ -86,7 +88,7 @@ public class BlokQuests extends JavaPlugin {
 	}
 
 
-	public YamlConfigurationSerializer getYamlDatabaseHandler() {
+	public YamlConfigurationSerializer getYamlSerializer() {
 		return yamlConfigurationSerializer;
 	}
 

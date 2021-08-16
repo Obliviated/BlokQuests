@@ -1,8 +1,7 @@
 package mc.obliviate.blokquests.rewards.itemrewards;
 
-import mc.obliviate.blokquests.utils.ConfigItem;
 import mc.obliviate.blokquests.rewards.QuestReward;
-import org.bukkit.Bukkit;
+import mc.obliviate.blokquests.utils.ConfigItem;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -29,7 +28,6 @@ public class ItemReward implements QuestReward {
 		final List<ItemStack> itemStackList = new ArrayList<>();
 		int lastIndex = 0;
 		while (section.getString(++lastIndex + "") != null) {
-			Bukkit.getLogger().info("item rew-" + lastIndex);
 			itemStackList.add(ConfigItem.deserializeConfigurableItem(section.getConfigurationSection(lastIndex + "")).toItemStack());
 		}
 		return new ItemReward(itemStackList);
