@@ -88,6 +88,7 @@ public class ConfigItem {
 	}
 
 	public ItemStack toItemStack(PlaceholderUtil placeholder) {
+
 		final ItemStack result = material.toItemStack(amount);
 
 

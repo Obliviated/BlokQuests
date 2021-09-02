@@ -28,7 +28,7 @@ public class QuestPageGui extends GUI {
 	private final QuestPage questPage;
 
 	public QuestPageGui(QuestPage questPage) {
-		super("quest-page-gui", "Görev Sayfası " + questPage.getPageNumber(), 5);
+		super("quest-page-gui", "Görev Sayfası: " + questPage.getPageNumber(), 5);
 		this.questPage = questPage;
 	}
 
@@ -43,7 +43,6 @@ public class QuestPageGui extends GUI {
 				}
 			}
 		}
-		for (int i = 0; i < displayItems.size(); i++) {
 
 		for (int i = 0; i < Math.min(displayItems.size(),5); i++) {
 			gui.addItem(i + 29, new Hytem(displayItems.get(i)));
@@ -77,8 +76,10 @@ public class QuestPageGui extends GUI {
 				.add("{quest_completed_parts}", BlokQuests.getaDatabase().getCompletedParts(quest, player) + "")
 				.add("{quest_parts}", quest.getQuestParts() + "")
 				.add("{player_name}", player.getName() + "")
-				.add("{dragon_kills}", MobKillRequirement.getMobKills(player, EntityType.ENDER_DRAGON) + "")
-				;
+				.add("{skeleton_kills}", MobKillRequirement.getMobKills(player, EntityType.SKELETON) + "")
+				.add("{creeper_kills}", MobKillRequirement.getMobKills(player, EntityType.CREEPER) + "")
+				.add("{zombie_kills}", MobKillRequirement.getMobKills(player, EntityType.ZOMBIE) + "")
+				.add("{dragon_kills}", MobKillRequirement.getMobKills(player, EntityType.ENDER_DRAGON) + "");
 	}
 
 	@Override
@@ -93,8 +94,8 @@ public class QuestPageGui extends GUI {
 		}
 
 		for (int i = 0; i < 5; i++) {
-			addItem(i * 9, new Hytem(XMaterial.GRAY_STAINED_GLASS_PANE.parseItem()));
-			addItem(i * 9 + 8, new Hytem(XMaterial.GRAY_STAINED_GLASS_PANE.parseItem()));
+			addItem(i * 9, new Hytem(Material.BLACK_STAINED_GLASS_PANE));
+			addItem(i * 9 + 8, new Hytem(Material.BLACK_STAINED_GLASS_PANE));
 		}
 
 		if (completedPages >= questPage.getPageNumber()) {
