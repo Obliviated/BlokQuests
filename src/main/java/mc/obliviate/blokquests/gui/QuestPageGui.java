@@ -86,7 +86,7 @@ public class QuestPageGui extends GUI {
 
 		final Player player = (Player) event.getPlayer();
 		int completedPages = BlokQuests.getaDatabase().getCompletedPages(player);
-		if (completedPages + 1 < questPage.getPageNumber()) {
+		if (completedPages + 1 < questPage.getPageNumber() && !player.isOp()) {
 			Bukkit.getScheduler().runTaskLater(getPlugin(), player::closeInventory, 1);
 			player.sendMessage(BlokUtils.parseColor("&cBu sayfayı henüz açmadınız: &7" + questPage.getPageNumber()));
 			return;
