@@ -44,6 +44,10 @@ public class DataHandler {
 		return null;
 	}
 
+	public Map<Integer, QuestPage> getQuestPages() {
+		return questPages;
+	}
+
 	public QuestPage getQuestPage(int pageNumber) {
 		return questPages.get(pageNumber);
 	}

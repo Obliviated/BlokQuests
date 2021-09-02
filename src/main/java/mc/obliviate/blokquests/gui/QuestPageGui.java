@@ -45,8 +45,11 @@ public class QuestPageGui extends GUI {
 		}
 		for (int i = 0; i < displayItems.size(); i++) {
 
+		for (int i = 0; i < Math.min(displayItems.size(),5); i++) {
 			gui.addItem(i + 29, new Hytem(displayItems.get(i)));
 		}
+
+
 
 	}
 

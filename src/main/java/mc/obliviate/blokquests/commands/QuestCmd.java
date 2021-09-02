@@ -43,6 +43,7 @@ public class QuestCmd implements CommandExecutor {
 		}
 
 		page = Math.max(page, 1);
+		page = Math.min(page, plugin.getDataHandler().getQuestPages().size());
 		final QuestPage questPage = plugin.getYamlSerializer().getQuestPageFromFile(page);
 		new QuestPageGui(questPage).open(player);
 
