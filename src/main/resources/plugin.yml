@@ -2,6 +2,10 @@ name: BlokQuests
 main: mc.obliviate.blokquests.BlokQuests
 author: Mr_Obliviate
 version: 1.0.1
+api-version: 1.16
+softdepend:
+  - SuperiorSkyblock2
+  - BentoBox
 commands:
   quest:
     aliases:
