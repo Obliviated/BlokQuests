@@ -1,2 +1,2 @@
 # BlokQuests
-Custom Quest plugin coded for Blok Dünyası!
+Lightweight quest plugin.
