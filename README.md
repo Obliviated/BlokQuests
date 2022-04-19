@@ -1,0 +1,2 @@
+# BlokQuests
+Lightweight quest plugin.
